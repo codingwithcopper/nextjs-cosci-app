@@ -19,6 +19,7 @@ import { authClient } from "@/lib/auth-client"; //import the auth client
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
+  name: z.string().min(1, "ชื่อ-สกุล ห้ามว่าง"),
   email: z.string().email("รูปแบบอีเมลไม่ถูกต้อง"),
   password: z.string().min(6, "รหัสผ่านต้องอย่างน้อย 6 ตัวอักษร"),
 });
@@ -27,6 +28,7 @@ const Signup01Page = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -36,7 +38,7 @@ const Signup01Page = () => {
   const onSubmit = async (form: z.infer<typeof formSchema>) => {
     
       await authClient.signUp.email({
-              name: "Your Name",
+              name: form.name,
               email: form.email,
               password: form.password,
           }, {
@@ -47,7 +49,7 @@ const Signup01Page = () => {
               onSuccess: (ctx) => {
                 //redirect to the dashboard or sign in page
                 console.log(ctx.data);
-                router.replace('/login');
+                router.replace('/');
               },
               onError: (ctx) => {
                   // display the error message
@@ -74,6 +76,26 @@ const Signup01Page = () => {
             className="w-full space-y-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Your Name"
+                      className="w-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="email"
